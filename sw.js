@@ -1,15 +1,6 @@
 const CACHE_NAME = "imss-pensiones-v11-3";
 
 self.addEventListener("install", function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll([
-        "index.html",
-        "manifest.webmanifest"
-      ]);
-    })
-  );
-
   self.skipWaiting();
 });
 
@@ -18,9 +9,9 @@ self.addEventListener("activate", function(event) {
     caches.keys().then(function(keys) {
       return Promise.all(
         keys.map(function(key) {
-          return key !== CACHE_NAME
-            ? caches.delete(key)
-            : Promise.resolve();
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
       );
     }).then(function() {
@@ -35,12 +26,22 @@ self.addEventListener("fetch", function(event) {
   }
 
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      if (response) {
-        return response;
+    caches.match(event.request).then(function(cached) {
+      if (cached) {
+        return cached;
       }
 
-      return fetch(event.request);
+      return fetch(event.request).then(function(response) {
+        if (response && response.ok) {
+          const copy = response.clone();
+
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(event.request, copy);
+          });
+        }
+
+        return response;
+      });
     })
   );
 });
