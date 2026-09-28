@@ -3,7 +3,7 @@
 #calc73Result .calcgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 #calc73Result .calcvalue{font-size:20px;font-weight:800}
 #calc73Result .trace{white-space:pre-wrap;background:#101820;color:#d9f2ff;padding:12px;border-radius:10px;font-size:12px;overflow:auto}
-</style></head><body><div class="wrap"><div class="card"><h1>IMSS Pensiones — V13.3 Ley 73</h1><div class="muted">PDF → páginas → OCR → extracción → revisión obligatoria → historia laboral.</div><div class="row" style="margin-top:12px"><span id="pdfStatus" class="pill">PDF.js: comprobando…</span><span id="ocrStatus" class="pill">OCR: comprobando…</span><span id="secureStatus" class="pill">Entorno: comprobando…</span></div></div><div class="card"><h2>1. Cargar constancia</h2><input id="pdfInput" type="file" accept="application/pdf,.pdf"><div id="fileInfo" class="status muted"></div><button id="ocrBtn" disabled style="margin-top:10px">Procesar constancia con OCR</button><div style="margin-top:10px"><progress id="prog" value="0" max="100"></progress></div><div id="progressText" class="small muted"></div></div><div id="review" class="card hidden"><h2>2. Revisión obligatoria</h2><div class="muted">El OCR propone los datos; el usuario debe verificarlos antes de incorporarlos al expediente.</div><div class="grid" style="margin-top:12px"><div class="field"><b>Nombre</b><input id="name"></div><div class="field"><b>NSS</b><input id="nss"></div><div class="field"><b>CURP</b><input id="curp"></div><div class="field"><b>Fecha de nacimiento</b><input id="dob" placeholder="DD/MM/AAAA"></div><div class="field"><b>Fecha de emisión</b><input id="issue" placeholder="DD/MM/AAAA"></div><div class="field"><b>Total semanas</b><input id="weeks" type="number"></div><div class="field"><b>Semanas descontadas</b><input id="discounted" type="number"></div><div class="field"><b>Semanas reintegradas</b><input id="reinstated" type="number"></div></div></div><div id="history" class="card hidden"><div class="bar"><h2 style="margin:0">3. Historia laboral extraída</h2><span id="historyCount" class="pill"></span></div><div class="muted" style="margin:8px 0">Los registros provienen del OCR. Antes del cálculo pensionario se podrán revisar y corregir individualmente.</div><div class="scroll"><table><thead><tr><th>Patrón</th><th>Registro</th><th>Entidad</th><th>Alta</th><th>Baja</th><th>SBC último</th><th>Movimientos</th></tr></thead><tbody id="historyBody"></tbody></table></div><div id="sbcReview" class="reviewbox"><h3>Control de calidad de SBC</h3><div id="sbcReviewStatus" class="muted">Se revisarán automáticamente importes que puedan haber perdido el punto decimal durante el OCR.</div><div id="sbcReviewBody"></div><div style="margin-top:14px"><button id="acceptBtn">Aceptar datos y guardar expediente</button><div class="small muted" style="margin-top:6px">Primero guarda o confirma todas las correcciones de SBC. Después acepta los datos para incorporarlos al expediente.</div></div></div></div><div id="summary" class="card hidden"><h2>4. Resumen del expediente</h2><div id="summaryGrid" class="grid"></div><div style="margin-top:12px" class="muted">C2 preliminar = semanas del documento + semanas reintegradas. Las semanas localizadas se capturan manualmente en el Escenario 2 y solo se incorporan después de la validación documental del operador.</div></div>
+</style></head><body><div class="wrap"><div class="card"><h1>IMSS Pensiones — V13.5 Ley 73</h1><div class="muted">PDF → páginas → OCR → extracción → revisión obligatoria → historia laboral.</div><div class="row" style="margin-top:12px"><span id="pdfStatus" class="pill">PDF.js: comprobando…</span><span id="ocrStatus" class="pill">OCR: comprobando…</span><span id="secureStatus" class="pill">Entorno: comprobando…</span></div></div><div class="card"><h2>1. Cargar constancia</h2><input id="pdfInput" type="file" accept="application/pdf,.pdf"><div id="fileInfo" class="status muted"></div><button id="ocrBtn" disabled style="margin-top:10px">Procesar constancia con OCR</button><div style="margin-top:10px"><progress id="prog" value="0" max="100"></progress></div><div id="progressText" class="small muted"></div></div><div id="review" class="card hidden"><h2>2. Revisión obligatoria</h2><div class="muted">El OCR propone los datos; el usuario debe verificarlos antes de incorporarlos al expediente.</div><div class="grid" style="margin-top:12px"><div class="field"><b>Nombre</b><input id="name"></div><div class="field"><b>NSS</b><input id="nss"></div><div class="field"><b>CURP</b><input id="curp"></div><div class="field"><b>Fecha de nacimiento</b><input id="dob" placeholder="DD/MM/AAAA"></div><div class="field"><b>Fecha de emisión</b><input id="issue" placeholder="DD/MM/AAAA"></div><div class="field"><b>Total semanas</b><input id="weeks" type="number"></div><div class="field"><b>Semanas descontadas</b><input id="discounted" type="number"></div><div class="field"><b>Semanas reintegradas</b><input id="reinstated" type="number"></div></div></div><div id="history" class="card hidden"><div class="bar"><h2 style="margin:0">3. Historia laboral extraída</h2><span id="historyCount" class="pill"></span></div><div class="muted" style="margin:8px 0">Los registros provienen del OCR. Antes del cálculo pensionario se podrán revisar y corregir individualmente.</div><div class="scroll"><table><thead><tr><th>Patrón</th><th>Registro</th><th>Entidad</th><th>Alta</th><th>Baja</th><th>SBC último</th><th>Movimientos</th></tr></thead><tbody id="historyBody"></tbody></table></div><div id="sbcReview" class="reviewbox"><h3>Control de calidad de SBC</h3><div id="sbcReviewStatus" class="muted">Se revisarán automáticamente importes que puedan haber perdido el punto decimal durante el OCR.</div><div id="sbcReviewBody"></div><div style="margin-top:14px"><button id="acceptBtn">Aceptar datos y guardar expediente</button><div class="small muted" style="margin-top:6px">Primero guarda o confirma todas las correcciones de SBC. Después acepta los datos para incorporarlos al expediente.</div></div></div></div><div id="summary" class="card hidden"><h2>4. Resumen del expediente</h2><div id="summaryGrid" class="grid"></div><div style="margin-top:12px" class="muted">C2 preliminar = semanas del documento + semanas reintegradas. Las semanas localizadas se capturan manualmente en el Escenario 2 y solo se incorporan después de la validación documental del operador.</div></div>
 <div id="calc73" class="card hidden">
 <h2>5. Cálculo Ley 73 — Escenario 1: situación actual</h2>
 <p class="muted">Base normativa: promedio de las últimas 250 semanas cotizadas; 500 semanas mínimas para Ley 73; incrementos por cada 52 semanas posteriores a las primeras 500. La fecha de baja es la fecha única de corte del cálculo. El total de semanas de la constancia queda protegido y el cálculo es trazable.</p>
@@ -46,14 +46,14 @@
 <div class="calcbox" style="margin-top:12px">
 <div class="bar"><b>Proyección por periodos</b><div class="row"><button id="s3AddPeriodBtn" type="button">➕ Añadir periodo de 6 meses</button><button id="s3AddYearBtn" type="button">➕ Añadir periodo de 1 año</button></div></div>
 <p class="muted">Cada periodo se genera con seis meses. Puedes modificar fechas, tipo y SBC. Al calcular, cada renglón muestra edad, porcentaje, salario promedio, costo acumulado de M40 y pensión proyectada en ese punto.</p>
-<div class="scroll"><table id="s3PeriodsTable"><thead><tr><th>Desde</th><th>Hasta</th><th>Tipo de periodo</th><th>SBC diario</th><th>Edad</th><th>% cálculo</th><th>Sem. periodo</th><th>Sem. acumuladas</th><th>Salario promedio</th><th>Costo M40</th><th>Monto mensual</th><th>Monto anual</th><th></th></tr></thead><tbody id="s3PeriodsBody"></tbody></table></div>
+<div class="scroll"><table id="s3PeriodsTable"><thead><tr><th>Desde</th><th>Hasta</th><th>Tipo de periodo</th><th>SBC diario</th><th>Edad</th><th>% cálculo</th><th>Sem. periodo</th><th>Sem. acumuladas</th><th>Salario promedio</th><th>Costo M40</th><th>Monto mensual</th><th>Monto anual</th><th></th></tr></thead><tbody id="s3PeriodsBody"></tbody></table></div><div class="small muted" style="margin-top:8px">El SBC diario inicial se toma del último SBC disponible en la historia laboral. Puedes modificarlo. La fecha final se ajusta al último día del mes.</div>
 </div>
 <div class="row" style="margin-top:10px"><button id="s3CalcBtn" type="button">Calcular Escenario 3</button></div>
 <div id="s3Status" class="status muted"></div>
 <div id="s3Result" class="hidden"></div>
 </div>
 <div class="card"><h2>Diagnóstico técnico</h2><div class="muted">V13.5 requiere HTTPS o localhost y acceso a PDF.js/Tesseract. Los SBC sospechosos quedan pendientes de revisión.</div><pre id="log">Inicializando…</pre></div></div><script>
-/* IMSS Pensiones V13.5 — cargador independiente de bibliotecas */
+/* IMSS Pensiones V12.9 — cargador independiente de bibliotecas */
 (function(){
   window.__imssLibStatus={tesseract:false,pdfjs:false};
   import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs')
@@ -95,7 +95,7 @@ function renderSbcReview(){const items=[];historyRows.forEach((r,ri)=>r.movement
 $('sbcReviewBody').addEventListener('click',e=>{const b=e.target.closest('button[data-sbc-action]');if(!b)return;const ri=+b.dataset.ri,mi=+b.dataset.mi,m=historyRows[ri]?.movements[mi];if(!m)return;const q=inspectSbc(historyRows[ri],m);if(b.dataset.sbcAction==='confirm'){m.correctedSbc='';m.reviewStatus='confirmed';m.reviewReason='Usuario confirmó valor OCR';}else{const input=$(`money-${ri}-${mi}`),value=String(input?.value||'').trim().replace(',','.');const n=moneyNumber(value);if(n===null||n<=0){alert('Escribe un importe válido.');return}if(q.suggestion){const suggested=moneyNumber(q.suggestion);const original=moneyNumber(m.sbc);if(suggested!==null&&original!==null&&Math.abs(n-original)<0.000001){alert('El OCR detectó un posible error de separador decimal. Usa la sugerencia $'+q.suggestion+' o confirma el OCR original.');input?.focus();return}}m.correctedSbc=moneyText(n);m.reviewStatus='corrected';m.reviewReason='Usuario corrigió valor OCR';}historyRows[ri].movements[mi]=m;renderHistory(historyRows);log(`Revisión SBC: patrón ${ri+1}, movimiento ${mi+1}, OCR=${m.originalSbc}, valor=${m.correctedSbc||m.sbc}, estado=${m.reviewStatus}.`)});
 function pendingSbcReviews(){return historyRows.flatMap(r=>r.movements).some(m=>m.reviewStatus==='pending')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('curp').addEventListener('input',()=>{const d=curpDob($('curp').value);if(d)$('dob').value=d});$('acceptBtn').addEventListener('click',()=>{if(pendingSbcReviews()){alert('Hay importes de SBC pendientes de revisión. Corrige o confirma cada uno antes de aceptar el expediente.');return}const r={version:'V13.3',createdAt:new Date().toISOString(),source:{fileName:selectedFile?.name||'',size:selectedFile?.size||0},person:{name:$('name').value.trim(),nss:$('nss').value.trim(),curp:$('curp').value.trim(),dob:$('dob').value.trim()},report:{issueDate:$('issue').value.trim(),weeks:+$('weeks').value||0,discounted:+$('discounted').value||0,reinstated:+$('reinstated').value||0},weeksC2:(+$('weeks').value||0)+(+$('reinstated').value||0),history:historyRows,ocrText:lastResult?.text||'',audit:[{at:new Date().toISOString(),action:'Aceptó datos y revisiones SBC',historyCorrections:historyRows.flatMap((x,ri)=>x.movements.map((m,mi)=>({ri,mi,originalSbc:m.originalSbc,correctedSbc:m.correctedSbc||null,status:m.reviewStatus,reason:m.reviewReason||''}))).filter(x=>x.status==='corrected'||x.status==='confirmed')}]};localStorage.setItem('imss_v13_3_last_case',JSON.stringify(r));showCalculator();$('summaryGrid').innerHTML=[['Nombre',r.person.name],['NSS',r.person.nss],['CURP',r.person.curp],['Nacimiento',r.person.dob],['Emisión',r.report.issueDate],['Semanas IMSS',r.report.weeks],['Descontadas',r.report.discounted],['Reintegradas',r.report.reinstated],['C2 preliminar',r.weeksC2],['Revisiones SBC',r.audit[0].historyCorrections.length]].map(x=>`<div class="field"><b>${x[0]}</b>${esc(x[1])}</div>`).join('');$('summary').classList.remove('hidden');log('Expediente V13.3 guardado localmente con trazabilidad de SBC.')});
+$('curp').addEventListener('input',()=>{const d=curpDob($('curp').value);if(d)$('dob').value=d});$('acceptBtn').addEventListener('click',()=>{if(pendingSbcReviews()){alert('Hay importes de SBC pendientes de revisión. Corrige o confirma cada uno antes de aceptar el expediente.');return}const r={version:'V13.5',createdAt:new Date().toISOString(),source:{fileName:selectedFile?.name||'',size:selectedFile?.size||0},person:{name:$('name').value.trim(),nss:$('nss').value.trim(),curp:$('curp').value.trim(),dob:$('dob').value.trim()},report:{issueDate:$('issue').value.trim(),weeks:+$('weeks').value||0,discounted:+$('discounted').value||0,reinstated:+$('reinstated').value||0},weeksC2:(+$('weeks').value||0)+(+$('reinstated').value||0),history:historyRows,ocrText:lastResult?.text||'',audit:[{at:new Date().toISOString(),action:'Aceptó datos y revisiones SBC',historyCorrections:historyRows.flatMap((x,ri)=>x.movements.map((m,mi)=>({ri,mi,originalSbc:m.originalSbc,correctedSbc:m.correctedSbc||null,status:m.reviewStatus,reason:m.reviewReason||''}))).filter(x=>x.status==='corrected'||x.status==='confirmed')}]};localStorage.setItem('imss_v13_5_last_case',JSON.stringify(r));showCalculator();$('summaryGrid').innerHTML=[['Nombre',r.person.name],['NSS',r.person.nss],['CURP',r.person.curp],['Nacimiento',r.person.dob],['Emisión',r.report.issueDate],['Semanas IMSS',r.report.weeks],['Descontadas',r.report.discounted],['Reintegradas',r.report.reinstated],['C2 preliminar',r.weeksC2],['Revisiones SBC',r.audit[0].historyCorrections.length]].map(x=>`<div class="field"><b>${x[0]}</b>${esc(x[1])}</div>`).join('');$('summary').classList.remove('hidden');log('Expediente V13.5 guardado localmente con trazabilidad de SBC.')});
 
 function parseDateDMY(s){
   const m=String(s||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -473,6 +473,18 @@ function makeS3Period(start,months,type,sbc){
   const end=endOfMonth(new Date(st.getFullYear(),st.getMonth()+months-1,1));
   return {start:toISO(st),end:toISO(end),type:type||'Modalidad 40',sbc:Number(sbc)||0};
 }
+function latestSbcFromHistory(rows){
+  let best=0,bestDate=null;
+  (rows||[]).forEach(r=>{
+    const base=moneyNumber(r.sbc), bd=parseDateDMY(r.alta);
+    if(base!==null&&base>0&&(!bestDate||!bd||bd>=bestDate)){best=base;if(bd)bestDate=bd;}
+    (r.movements||[]).forEach(m=>{
+      const v=moneyNumber(m.correctedSbc||m.sbc), d=parseDateDMY(m.date);
+      if(v!==null&&v>0&&d&&(!bestDate||d>=bestDate)){best=v;bestDate=d;}
+    });
+  });
+  return best;
+}
 window.s3Periods=window.s3Periods||[];
 function toISO(d){return d?d.toISOString().slice(0,10):'';}
 function addMonths(d,n){const x=new Date(d); const day=x.getDate(); x.setMonth(x.getMonth()+n); if(x.getDate()!==day)x.setDate(0); return x;}
@@ -489,19 +501,17 @@ function renderS3Periods(){
  <td id="s3age_${i}">—</td><td id="s3pct_${i}">—</td><td id="s3w_${i}">—</td><td id="s3cw_${i}">—</td><td id="s3avg_${i}">—</td><td id="s3cost_${i}">—</td><td id="s3monthly_${i}">—</td><td id="s3annual_${i}">—</td>
  <td><button type="button" data-s3del="${i}">🗑</button></td></tr>`).join('');
  body.querySelectorAll('[data-s3]').forEach(el=>{
-  el.addEventListener('input',()=>{
-    const i=Number(el.dataset.i);
-    window.s3Periods[i][el.dataset.s3]=el.value;
-    if(el.dataset.s3==='sbc') window.s3Periods[i].sbc=Number(el.value)||0;
-    renderS3RowsCalculations();
-  });
-  el.addEventListener('change',()=>{
-
-   const i=Number(el.dataset.i); window.s3Periods[i][el.dataset.s3]=el.value;
-   if(el.dataset.s3==='sbc')window.s3Periods[i].sbc=Number(el.value)||0;
-   renderS3RowsCalculations();
+   const ev=el.dataset.s3==='sbc'?'input':'change';
+   el.addEventListener(ev,()=>{
+     const i=Number(el.dataset.i); window.s3Periods[i][el.dataset.s3]=el.value;
+     if(el.dataset.s3==='sbc')window.s3Periods[i].sbc=Number(String(el.value).replace(',','.'))||0;
+     if(el.dataset.s3==='start'){
+       const st=parseISODate(el.value);
+       if(st)window.s3Periods[i].end=toISO(endOfMonth(new Date(st.getFullYear(),st.getMonth()+5,1)));
+     }
+     renderS3RowsCalculations();
+   });
  });
-  });
  body.querySelectorAll('[data-s3del]').forEach(el=>el.addEventListener('click',()=>{
    window.s3Periods.splice(Number(el.dataset.s3del),1); renderS3Periods(); renderS3RowsCalculations();
  }));
@@ -573,7 +583,7 @@ function calculateScenario3(){
  if(!baja)messages.push('Falta la fecha de baja.');
  if(base<500)messages.push('Las semanas C2 de partida son menores de 500.');
  if(!periods.length)messages.push('Agrega al menos un periodo.');
- if(valid.some((x)=>!x))messages.push('Hay un periodo incompleto o con SBC inválido. Verifica que cada periodo tenga SBC diario mayor que cero.');
+ if(valid.some((x)=>!x))messages.push('Hay un periodo incompleto o con SBC inválido. Captura un SBC diario mayor que cero.');
  for(let i=1;i<valid.length;i++){
    if(valid[i]&&valid[i-1]&&valid[i].startDate<=valid[i-1].endDate)messages.push('Los periodos deben ser consecutivos y no traslaparse.');
  }
@@ -595,35 +605,9 @@ function latestBajaFromHistory(rows){
   return latest;
 }
 
-
-function defaultS3Sbc(){
-  const rows=historyRows||[];
-  let best=null,bestDate=null;
-  for(const r of rows){
-    const direct=Number(r.sbc)||0;
-    if(direct>0){
-      const d=parseDateDMY(r.baja)||parseDateDMY(r.alta);
-      if(best===null || (d && (!bestDate || d>bestDate))){best=direct;bestDate=d||bestDate;}
-    }
-    for(const m of (r.movements||[])){
-      const v=Number(m.correctedSbc||m.sbc)||0;
-      const d=parseDateDMY(m.date);
-      if(v>0 && (best===null || (d && (!bestDate || d>bestDate)))){best=v;bestDate=d||bestDate;}
-    }
-  }
-  if(best!==null) return best;
-  try{
-    const cutoff=parseISOInput('s3Baja')||parseISOInput('calcBaja')||new Date();
-    const ints=reconstructIntervals(rows,cutoff)||[];
-    const active=ints.filter(x=>x.sbc>0).sort((a,b)=>b.end-a.end);
-    if(active.length) return Number(active[0].sbc)||0;
-  }catch(e){}
-  return 0;
-}
-
 function showCalculator(){
   const c=$('calc73'); if(!c)return;
-  const saved=localStorage.getItem('imss_v13_3_last_case');
+  const saved=localStorage.getItem('imss_v13_5_last_case');
   if(saved){try{
     const r=JSON.parse(saved);
     $('calcWeeks').value=r.report?.weeks||'';
@@ -645,13 +629,12 @@ function showCalculator(){
   if(!$('s3Baja').value){$('s3Baja').value=$('calcBaja').value||'';}
   if(!$('s3M40Rate').value)$('s3M40Rate').value='14.438';
   if(!window.s3Periods || !window.s3Periods.length){
-    const start=$('s3Baja').value ? addDays(parseISOInput('s3Baja'),1) : parseISOInput('2024-01-01');
-    const initialSbc = defaultS3Sbc();
-window.s3Periods=[makeS3Period(start||parseISOInput('2024-01-01'),6,'Modalidad 40',initialSbc)];
-  }
-  const autoSbc=defaultS3Sbc();
-  if(autoSbc>0){
-    window.s3Periods=(window.s3Periods||[]).map(function(p){return Number(p.sbc)>0?p:{...p,sbc:autoSbc};});
+    const startDate=$('s3Baja').value ? addDays(parseISOInput('s3Baja'),1) : parseISODate('2024-01-01');
+    const initialSbc=latestSbcFromHistory(historyRows);
+    window.s3Periods=[makeS3Period(startDate||parseISODate('2024-01-01'),6,'Modalidad 40',initialSbc)];
+  } else {
+    const recovered=latestSbcFromHistory(historyRows);
+    if(Number(window.s3Periods[0]?.sbc||0)<=0 && recovered>0) window.s3Periods[0].sbc=recovered;
   }
   renderS3Periods();
   $('s2ReinstatedWeeks').value=Number($('reinstated')?.value||0);
