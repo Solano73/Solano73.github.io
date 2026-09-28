@@ -1,24 +1,21 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b3d5c"><link rel="manifest" href="manifest.webmanifest"><title>IMSS Pensiones — V12.4 Ley 73</title><style>:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#173042;background:#f4f7f9}body{margin:0}.wrap{max-width:1100px;margin:auto;padding:16px}.card{background:#fff;border:1px solid #d8e0e5;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}h1{font-size:24px;margin:0 0 6px}h2{font-size:19px;margin:0 0 10px}.muted{color:#60717d}.small{font-size:12px}.pill{display:inline-block;border-radius:999px;padding:5px 9px;margin:3px;font-size:12px;background:#e9eef2}.ok{background:#dff5e7;color:#176b38}.warn{background:#fff3cd;color:#795600}.bad{background:#fde2e2;color:#9a1f1f}button{border:0;border-radius:10px;padding:11px 15px;background:#0b3d5c;color:#fff;font-weight:700;cursor:pointer;margin:4px}button.secondary{background:#647785}button:disabled{opacity:.5;cursor:not-allowed}input,select,textarea{width:100%;box-sizing:border-box;padding:9px;border:1px solid #cbd6dc;border-radius:8px;margin-top:4px;background:#fff}label{display:block;font-weight:600;font-size:13px;margin:9px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.tablewrap{overflow:auto}.tbl{border-collapse:collapse;width:100%;font-size:12px}.tbl th,.tbl td{border:1px solid #d6dfe4;padding:6px;text-align:left;vertical-align:top}.tbl th{background:#eef3f6}.result{font-size:18px;font-weight:800}.trace{white-space:pre-wrap;background:#f5f7f8;border-radius:10px;padding:12px;font-family:ui-monospace,monospace;font-size:12px}.hidden{display:none}.drop{border:2px dashed #aebfc9;padding:20px;text-align:center;border-radius:12px}.danger{border-left:5px solid #b42318}.success{border-left:5px solid #218739}.info{border-left:5px solid #1769aa}</style><script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script><script type="module">import*as pdfjsLib from"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";window.pdfjsLib=pdfjsLib;</script></head><body><div class="wrap"><div class="card"><h1>IMSS Pensiones — V12.4 Ley 73</h1><div class="muted">PDF → páginas → OCR → extracción → revisión obligatoria → historia laboral → parámetros versionados → cálculo Ley 73.</div><div class="row"><span id="pdfStatus" class="pill warn">PDF.js: comprobando…</span><span id="ocrStatus" class="pill warn">OCR: comprobando…</span><span id="envStatus" class="pill warn">Entorno: comprobando…</span></div></div><div class="card"><h2>1. Cargar constancia IMSS</h2><div class="drop"><input id="pdfInput" type="file" accept="application/pdf"><div class="muted small">Carga la Constancia de Semanas Cotizadas original en PDF. El documento original debe conservarse sin modificaciones.</div></div><div class="row"><button id="processBtn" disabled>Procesar PDF</button><button id="clearBtn" class="secondary">Limpiar</button></div><div id="diag" class="small muted">Inicializando…</div><div id="log" class="trace">Esperando archivo.</div></div><div id="reviewCard" class="card hidden"><h2>2. Revisión obligatoria de extracción</h2><div id="reviewSummary"></div><div id="historyReview"></div><div class="row"><button id="acceptBtn">Aceptar datos revisados</button><button id="rejectBtn" class="secondary">Rechazar y volver a procesar</button></div></div><div id="calcCard" class="card hidden"><h2>3. Cálculo Ley 73 — Escenario 1</h2><div class="grid"><div><label>Fecha de baja / fecha de cálculo<input id="cutoffDate" type="date"></label></div><div><label>Fecha de solicitud<input id="applicationDate" type="date" disabled><div class="small muted">No utilizada. La fecha de baja/corte es la referencia exclusiva del cálculo.</div></label></div><div><label>Salario mínimo diario aplicable<input id="minWage" type="number" step="0.01"></label></div><div><label>Pensión mínima mensual<input id="minPension" type="number" step="0.01" readonly></label></div></div><div class="row"><button id="calcBtn">Calcular pensión</button><button id="snapshotBtn" class="secondary" disabled>Guardar snapshot</button></div><div id="result73"></div><div id="trace73"></div></div><div id="paramsCard" class="card"><h2>4. Catálogo histórico de parámetros</h2><div class="small muted">Los parámetros tienen vigencia, versión y fuente. El cálculo toma el valor aplicable a la fecha de baja/corte y conserva un snapshot para reproducibilidad.</div><div id="paramsView"></div></div></div><script>
-const APP_VERSION="V12.4";
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b3d5c"><link rel="manifest" href="manifest.webmanifest"><title>IMSS Pensiones — V12.5 Ley 73</title><style>:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#173042;background:#f4f7f9}body{margin:0}.wrap{max-width:1100px;margin:auto;padding:16px}.card{background:#fff;border:1px solid #d8e1e7;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000b}h1{font-size:22px;margin:0 0 6px}h2{font-size:18px;margin:0 0 12px}.muted{color:#607482;font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.pill{padding:7px 10px;border-radius:999px;background:#eef3f6;font-size:13px}.ok{background:#e8f7ee;color:#12653b}.warn{background:#fff5dc;color:#785400}.bad{background:#fdeaea;color:#8c2525}button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;background:#0b5d87;color:#fff;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}input[type=file]{width:100%;padding:12px;border:1px dashed #8ba1af;border-radius:10px;background:#fafcfd}progress{width:100%;height:14px}pre{white-space:pre-wrap;max-height:420px;overflow:auto;background:#101820;color:#d9f2ff;padding:12px;border-radius:10px;font-size:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.field{border:1px solid #dce5ea;border-radius:10px;padding:10px}.field b{display:block;font-size:12px;color:#526774;margin-bottom:4px}.result{font-size:25px;font-weight:800;color:#0b5d87}.danger{border-left:5px solid #b42318}.success{border-left:5px solid #218739}.info{border-left:5px solid #1769aa}.hidden{display:none}.tablewrap{overflow:auto}.tbl{border-collapse:collapse;width:100%;font-size:12px}.tbl th,.tbl td{border:1px solid #d6dfe4;padding:6px;text-align:left;vertical-align:top}.tbl th{background:#eef3f6}label{display:block;font-weight:600;font-size:13px;margin:8px 0}input[type=date],input[type=number],input[type=text]{box-sizing:border-box;width:100%;padding:9px;border:1px solid #cbd6dc;border-radius:8px;background:#fff}.small{font-size:12px}</style><script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script><script type="module">import*as pdfjsLib from"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";window.pdfjsLib=pdfjsLib;</script></head><body><div class="wrap"><div class="card"><h1>IMSS Pensiones — V12.5 Ley 73</h1><div class="muted">PDF → páginas → OCR → extracción → revisión obligatoria → historia laboral → parámetros versionados → cálculo Ley 73.</div><div class="row"><span id="pdfStatus" class="pill warn">PDF.js: comprobando…</span><span id="ocrStatus" class="pill warn">OCR: comprobando…</span><span id="envStatus" class="pill warn">Entorno: comprobando…</span></div></div><div class="card"><h2>1. Cargar constancia IMSS</h2><input id="pdfInput" type="file" accept="application/pdf"><div class="small muted">Carga la Constancia de Semanas Cotizadas original en PDF. El documento original debe conservarse sin modificaciones.</div><div class="row" style="margin-top:10px"><button id="processBtn" disabled>Procesar PDF</button><button id="clearBtn">Limpiar</button></div><div id="diag" class="small muted" style="margin-top:10px">Inicializando…</div><pre id="log">Esperando archivo.</pre></div><div id="reviewCard" class="card hidden"><h2>2. Revisión obligatoria de extracción</h2><div id="reviewSummary"></div><div id="historyReview"></div><div class="row"><button id="acceptBtn">Aceptar datos revisados</button><button id="rejectBtn">Rechazar y volver a procesar</button></div></div><div id="calcCard" class="card hidden"><h2>3. Cálculo Ley 73 — Escenario 1</h2><div class="grid"><div class="field"><label>Fecha de baja / fecha de cálculo<input id="cutoffDate" type="date"></label></div><div class="field"><label>Fecha de solicitud<input id="applicationDate" type="date" disabled></label><div class="small muted">No utilizada. La fecha de baja/corte es la referencia exclusiva del cálculo.</div></div><div class="field"><label>Salario mínimo diario aplicable<input id="minWage" type="number" step="0.01"></label></div><div class="field"><label>Pensión mínima mensual<input id="minPension" type="number" step="0.01" readonly></label></div></div><div class="row"><button id="calcBtn">Calcular pensión</button><button id="snapshotBtn" disabled>Guardar snapshot</button></div><div id="result73"></div><div id="trace73"></div></div><div class="card"><h2>4. Catálogo histórico de parámetros</h2><div class="small muted">Los parámetros tienen vigencia, versión y fuente. El cálculo toma el valor aplicable a la fecha de baja/corte y conserva un snapshot para reproducibilidad.</div><div id="paramsView"></div></div></div><script>
+const APP_VERSION="V12.5";
 const $=id=>document.getElementById(id);
-const log=(m)=>{$("log").textContent+=`\\n${m}`;};
+const log=m=>{$("log").textContent+=`\n${m}`};
 const money=n=>Number.isFinite(Number(n))?Number(n).toLocaleString("es-MX",{style:"currency",currency:"MXN"}):"—";
 const num=n=>Number.isFinite(Number(n))?Number(n).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
-const isoToday=()=>{const d=new Date();const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
-const parseMoney=v=>{if(v==null)return null;let s=String(v).replace(/[^\d,.-]/g,"").trim();if(!s)return null;if(s.includes(",")&&s.includes(".")){if(s.lastIndexOf(",")>s.lastIndexOf("."))s=s.replace(/\./g,"").replace(",",".");else s=s.replace(/,/g,"")}else if(s.includes(",")&&!s.includes(".")){s=s.replace(",",".")}const x=Number(s);return Number.isFinite(x)?x:null};
+const isoToday=()=>{const d=new Date(),z=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
+const parseMoney=v=>{if(v==null)return null;let s=String(v).replace(/[^\d,.-]/g,"").trim();if(!s)return null;if(s.includes(",")&&s.includes(".")){if(s.lastIndexOf(",")>s.lastIndexOf("."))s=s.replace(/\./g,"").replace(",",".");else s=s.replace(/,/g,"")}else if(s.includes(",")&&!s.includes("."))s=s.replace(",",".");const x=Number(s);return Number.isFinite(x)?x:null};
 const daysBetween=(a,b)=>{const x=new Date(a+"T00:00:00"),y=new Date(b+"T00:00:00");return Math.max(0,Math.round((y-x)/86400000)+1)};
 const weeksFromDays=d=>Math.floor(d/7)+(d%7>3?1:0);
 
-let CASE=null;
-let PDF_BYTES=null;
-let OCR_PAGES=[];
-let PARAM_SNAPSHOT=null;
+let CASE=null,PDF_BYTES=null,OCR_PAGES=[],PARAM_SNAPSHOT=null;
 
 const PARAM_CATALOG=[
- {key:"minWageGeneral",label:"Salario mínimo general",unit:"MXN/día",source:"CONASAMI",version:"2026.01",from:"2026-01-01",to:null,value:315.04,notes:"Zona del Salario Mínimo General; Puebla."},
- {key:"minimumPensionFactor",label:"Factor anual pensión mínima",unit:"factor",source:"IMSS procedimiento 3A10-003-001",version:"2026.01",from:"2026-01-01",to:null,value:1.11,notes:"Factor equivalente al 11% adicional para la cuantificación anual indicada en el procedimiento."},
- {key:"minimumPensionMonths",label:"Meses para mensualizar pensión mínima",unit:"meses",source:"IMSS procedimiento 3A10-003-001",version:"histórico",from:"1973-01-01",to:null,value:12,notes:"365 días / 12 meses."},
- {key:"minimumPensionDays",label:"Días del año",unit:"días",source:"IMSS procedimiento 3A10-003-001",version:"histórico",from:"1973-01-01",to:null,value:365,notes:"Base de anualización."}
+{key:"minWageGeneral",label:"Salario mínimo general",unit:"MXN/día",source:"CONASAMI",version:"2026.01",from:"2026-01-01",to:null,value:315.04,notes:"Zona del Salario Mínimo General; Puebla."},
+{key:"minimumPensionFactor",label:"Factor anual pensión mínima",unit:"factor",source:"IMSS procedimiento 3A10-003-001",version:"2026.01",from:"2026-01-01",to:null,value:1.11,notes:"Factor equivalente al 11% adicional para la cuantificación anual indicada en el procedimiento."},
+{key:"minimumPensionMonths",label:"Meses para mensualizar pensión mínima",unit:"meses",source:"IMSS procedimiento 3A10-003-001",version:"histórico",from:"1973-01-01",to:null,value:12,notes:"365 días / 12 meses."},
+{key:"minimumPensionDays",label:"Días del año",unit:"días",source:"IMSS procedimiento 3A10-003-001",version:"histórico",from:"1973-01-01",to:null,value:365,notes:"Base de anualización."}
 ];
 
 function getParamAt(key,date){
@@ -26,6 +23,7 @@ function getParamAt(key,date){
  rows.sort((a,b)=>b.from.localeCompare(a.from));
  return rows[0]||null;
 }
+
 function getMinimumSnapshot(date){
  const wage=getParamAt("minWageGeneral",date);
  const factor=getParamAt("minimumPensionFactor",date);
@@ -33,41 +31,48 @@ function getMinimumSnapshot(date){
  const months=getParamAt("minimumPensionMonths",date);
  if(!wage||!factor||!days||!months)return null;
  const base=wage.value*days.value/months.value;
- const monthly=base*factor.value;
- return {wage:wage.value,days:days.value,months:months.value,factor:factor.value,base,monthly,versions:[wage.version,factor.version,days.version,months.version]};
+ return{wage:wage.value,days:days.value,months:months.value,factor:factor.value,base,monthly:base*factor.value,versions:[wage.version,factor.version,days.version,months.version]};
 }
+
 function refreshMinimumFields(){
- const date=$("cutoffDate").value||isoToday();
- const x=getMinimumSnapshot(date);
- if(x){
-   $("minWage").value=x.wage.toFixed(2);
-   $("minPension").value=x.monthly.toFixed(2);
- }
+ const x=getMinimumSnapshot($("cutoffDate").value||isoToday());
+ if(x){$("minWage").value=x.wage.toFixed(2);$("minPension").value=x.monthly.toFixed(2)}
 }
 
 function renderParams(){
  $("paramsView").innerHTML=`<div class="tablewrap"><table class="tbl"><thead><tr><th>Parámetro</th><th>Valor</th><th>Vigencia</th><th>Versión</th><th>Fuente</th></tr></thead><tbody>${PARAM_CATALOG.map(p=>`<tr><td>${p.label}</td><td>${p.unit==="MXN/día"?money(p.value):p.value}</td><td>${p.from} → ${p.to||"vigente"}</td><td>${p.version}</td><td>${p.source}</td></tr>`).join("")}</tbody></table></div>`;
 }
-renderParams();
 
 function checkLibs(){
  const pdfOk=!!window.pdfjsLib;
  const ocrOk=!!window.Tesseract;
- $("pdfStatus").textContent=`PDF.js: ${pdfOk?"listo":"no disponible"}`;
- $("pdfStatus").className=`pill ${pdfOk?"ok":"bad"}`;
+ $("pdfStatus").textContent=`PDF.js: ${pdfOk?"listo":"esperando"}`;
+ $("pdfStatus").className=`pill ${pdfOk?"ok":"warn"}`;
  $("ocrStatus").textContent=`OCR: ${ocrOk?"listo":"esperando"}`;
  $("ocrStatus").className=`pill ${ocrOk?"ok":"warn"}`;
  const secure=location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1";
  $("envStatus").textContent=`Entorno: ${secure?"compatible":"requiere HTTPS o localhost"}`;
  $("envStatus").className=`pill ${secure?"ok":"bad"}`;
  $("processBtn").disabled=!(pdfOk&&ocrOk&&secure&&PDF_BYTES);
- $("diag").textContent=`V12.4 · PDF.js ${pdfOk?"OK":"pendiente"} · Tesseract ${ocrOk?"OK":"pendiente"} · ${secure?"HTTPS/localhost":"HTTPS requerido"}`;
+ $("diag").textContent=`V12.5 · PDF.js ${pdfOk?"OK":"pendiente"} · Tesseract ${ocrOk?"OK":"pendiente"} · ${secure?"HTTPS/localhost":"HTTPS requerido"}`;
 }
-window.addEventListener("load",()=>{setTimeout(checkLibs,100);setTimeout(checkLibs,1000);});
-setInterval(checkLibs,1500);
+
+window.addEventListener("error",e=>{
+ const d=$("diag");
+ if(d)d.textContent="Error JavaScript: "+(e.message||"error desconocido");
+});
+
+window.addEventListener("load",()=>{
+ setTimeout(checkLibs,300);
+ setTimeout(checkLibs,1000);
+ setTimeout(checkLibs,2500);
+});
+
+setInterval(checkLibs,1000);
 
 $("cutoffDate").value=isoToday();
 refreshMinimumFields();
+
 $("cutoffDate").addEventListener("change",refreshMinimumFields);
 
 $("pdfInput").addEventListener("change",async e=>{
@@ -75,7 +80,7 @@ $("pdfInput").addEventListener("change",async e=>{
  if(!f)return;
  PDF_BYTES=await f.arrayBuffer();
  $("processBtn").disabled=true;
- $("log").textContent=`Archivo: ${f.name}\\nTamaño: ${(f.size/1024/1024).toFixed(2)} MB\\nListo para procesar.`;
+ $("log").textContent=`Archivo: ${f.name}\nTamaño: ${(f.size/1024/1024).toFixed(2)} MB\nListo para procesar.`;
  checkLibs();
 });
 
@@ -89,44 +94,50 @@ $("clearBtn").addEventListener("click",()=>{
 });
 
 function normalizeText(s){
- return String(s||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\s+/g," ").trim().toUpperCase();
+ return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim().toUpperCase();
 }
+
 function parseDateDMY(s){
- const m=String(s||"").match(/(\\d{1,2})[\\/-](\\d{1,2})[\\/-](\\d{4})/);
+ const m=String(s||"").match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
  if(!m)return null;
- return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+ return`${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
 }
-function extractFirst(re,text){const m=text.match(re);return m?m[1].trim():"";}
+
+function extractFirst(re,text){
+ const m=text.match(re);
+ return m?m[1].trim():"";
+}
+
 function extractWeeks(text){
- const m=text.match(/TOTAL\\s+DE\\s+SEMANAS[^\\d]*(\\d{1,5})/i)||text.match(/SEMANAS\\s+COTIZADAS[^\\d]*(\\d{1,5})/i);
+ const m=text.match(/TOTAL\s+DE\s+SEMANAS[^\d]*(\d{1,5})/i)||text.match(/SEMANAS\s+COTIZADAS[^\d]*(\d{1,5})/i);
  return m?Number(m[1]):null;
 }
+
 function extractDiscounted(text){
- const m=text.match(/SEMANAS\\s+DESCONTADAS[^\\d]*(\\d{1,5})/i)||text.match(/DESCONTADAS[^\\d]*(\\d{1,5})/i);
+ const m=text.match(/SEMANAS\s+DESCONTADAS[^\d]*(\d{1,5})/i)||text.match(/DESCONTADAS[^\d]*(\d{1,5})/i);
  return m?Number(m[1]):0;
 }
+
 function extractReinstated(text){
- const m=text.match(/SEMANAS\\s+REINTEGRADAS[^\\d]*(\\d{1,5})/i)||text.match(/REINTEGRADAS[^\\d]*(\\d{1,5})/i);
+ const m=text.match(/SEMANAS\s+REINTEGRADAS[^\d]*(\d{1,5})/i)||text.match(/REINTEGRADAS[^\d]*(\d{1,5})/i);
  return m?Number(m[1]):0;
 }
+
 function parseHeader(text){
- const n=extractFirst(/NOMBRE\\s*:?\\s*([A-ZÁÉÍÓÚÑ ]{5,})\\s+(?:NSS|NUMERO|NÚMERO)/i,text)||extractFirst(/NOMBRE\\s*:?\\s*([A-ZÁÉÍÓÚÑ ]{5,})/i,text);
- const nss=extractFirst(/(?:NSS|NUMERO\\s+DE\\s+SEGURIDAD\\s+SOCIAL)\\s*:?\\s*(\\d{10,11})/i,text);
- const curp=extractFirst(/CURP\\s*:?\\s*([A-Z0-9]{18})/i,text);
- const issue=extractFirst(/(?:FECHA\\s+DE\\s+EMISION|EMISION|EXPEDICION|EXPEDICIÓN)\\s*:?\\s*([^\\n]{6,20})/i,text);
+ const n=extractFirst(/NOMBRE\s*:?\s*([A-ZÁÉÍÓÚÑ ]{5,})\s+(?:NSS|NUMERO|NÚMERO)/i,text)||extractFirst(/NOMBRE\s*:?\s*([A-ZÁÉÍÓÚÑ ]{5,})/i,text);
+ const nss=extractFirst(/(?:NSS|NUMERO\s+DE\s+SEGURIDAD\s+SOCIAL)\s*:?\s*(\d{10,11})/i,text);
+ const curp=extractFirst(/CURP\s*:?\s*([A-Z0-9]{18})/i,text);
+ const issue=extractFirst(/(?:FECHA\s+DE\s+EMISION|EMISION|EXPEDICION|EXPEDICIÓN)\s*:?\s*([^\n]{6,20})/i,text);
  const dobFromCurp=curp.length===18?`19${curp.slice(4,6)}-${curp.slice(6,8)}-${curp.slice(8,10)}`:null;
- return {name:n.replace(/\\s+/g," ").trim(),nss,curp,dob:dobFromCurp,issueDate:parseDateDMY(issue),weeks:extractWeeks(text),discountedWeeks:extractDiscounted(text),reinstatedWeeks:extractReinstated(text)};
+ return{name:n.replace(/\s+/g," ").trim(),nss,curp,dob:dobFromCurp,issueDate:parseDateDMY(issue),weeks:extractWeeks(text),discountedWeeks:extractDiscounted(text),reinstatedWeeks:extractReinstated(text)};
 }
 
 function parseHistory(text){
- const lines=text.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
- const rows=[];
+ const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),rows=[];
  for(let i=0;i<lines.length;i++){
-   const line=lines[i];
-   const m=line.match(/(\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4}).*?(\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{4})?.*?([\\$]?\\s*[\\d,]+(?:\\.\\d{1,2})?)/);
-   if(m){
-     rows.push({raw:line,alta:parseDateDMY(m[1]),baja:m[2]?parseDateDMY(m[2]):null,sbc:parseMoney(m[3]),status:"OCR"});
-   }
+  const line=lines[i];
+  const m=line.match(/(\d{1,2}[\/-]\d{1,2}[\/-]\d{4}).*?(\d{1,2}[\/-]\d{1,2}[\/-]\d{4})?.*?([\$]?\s*[\d,]+(?:\.\d{1,2})?)/);
+  if(m)rows.push({raw:line,alta:parseDateDMY(m[1]),baja:m[2]?parseDateDMY(m[2]):null,sbc:parseMoney(m[3]),status:"OCR"});
  }
  return rows;
 }
@@ -134,684 +145,367 @@ function parseHistory(text){
 async function renderPage(page){
  const viewport=page.getViewport({scale:1.7});
  const canvas=document.createElement("canvas");
- canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+ canvas.width=Math.ceil(viewport.width);
+ canvas.height=Math.ceil(viewport.height);
  const ctx=canvas.getContext("2d");
  await page.render({canvasContext:ctx,viewport}).promise;
  return canvas;
 }
+
 async function ocrCanvas(canvas,pageNo){
  const worker=await Tesseract.createWorker("spa");
  const r=await worker.recognize(canvas);
  await worker.terminate();
- return {page:pageNo,text:r.data.text||"",confidence:r.data.confidence||0};
+ return{page:pageNo,text:r.data.text||"",confidence:r.data.confidence||0};
 }
 async function processPDF(){
- if(!PDF_BYTES){alert("Selecciona primero un PDF.");return;}
- if(!window.pdfjsLib){alert("PDF.js todavía no está disponible.");return;}
- if(!window.Tesseract){alert("Tesseract todavía no está disponible. Espera unos segundos y vuelve a intentarlo.");return;}
+ if(!PDF_BYTES){
+  alert("Selecciona primero un PDF.");
+  return;
+ }
+
+ if(!window.pdfjsLib){
+  alert("PDF.js todavía no está disponible.");
+  return;
+ }
+
+ if(!window.Tesseract){
+  alert("Tesseract todavía no está disponible. Espera unos segundos y vuelve a intentarlo.");
+  return;
+ }
 
  $("processBtn").disabled=true;
  OCR_PAGES=[];
  $("log").textContent="Iniciando procesamiento del PDF…";
 
  try{
-   const pdf=await window.pdfjsLib.getDocument({data:PDF_BYTES}).promise;
-   log(`Páginas detectadas: ${pdf.numPages}`);
+  const pdf=await window.pdfjsLib.getDocument({data:PDF_BYTES}).promise;
+  log(`Páginas detectadas: ${pdf.numPages}`);
 
-   let fullText="";
-   for(let i=1;i<=pdf.numPages;i++){
-     log(`Procesando página ${i} de ${pdf.numPages}…`);
-     const page=await pdf.getPage(i);
-     const canvas=await renderPage(page);
-     const result=await ocrCanvas(canvas,i);
-     OCR_PAGES.push(result);
-     fullText+=`\n--- PÁGINA ${i} ---\n${result.text}`;
-   }
+  let fullText="";
 
-   log(`OCR terminado: ${OCR_PAGES.length} páginas procesadas.`);
+  for(let i=1;i<=pdf.numPages;i++){
+   log(`Procesando página ${i} de ${pdf.numPages}…`);
 
-   const header=parseHeader(fullText);
-   const history=parseHistory(fullText);
+   const page=await pdf.getPage(i);
+   const canvas=await renderPage(page);
+   const result=await ocrCanvas(canvas,i);
 
-   CASE={
-     appVersion:APP_VERSION,
-     originalFileName:$("pdfInput").files?.[0]?.name||"",
-     processedAt:new Date().toISOString(),
-     originalPdfSize:PDF_BYTES.byteLength,
-     rawText:fullText,
-     pages:OCR_PAGES,
-     header,
-     history,
-     reviewed:false,
-     calculation:null,
-     snapshot:null
-   };
+   OCR_PAGES.push(result);
+   fullText+=`\n--- PÁGINA ${i} ---\n${result.text}`;
+  }
 
-   renderReview(CASE);
-   $("reviewCard").classList.remove("hidden");
-   $("calcCard").classList.add("hidden");
+  log(`OCR terminado: ${OCR_PAGES.length} páginas procesadas.`);
+
+  const header=parseHeader(fullText);
+  const history=parseHistory(fullText);
+
+  CASE={
+   appVersion:APP_VERSION,
+   originalFileName:$("pdfInput").files?.[0]?.name||"",
+   processedAt:new Date().toISOString(),
+   originalPdfSize:PDF_BYTES.byteLength,
+   rawText:fullText,
+   pages:OCR_PAGES,
+   header,
+   history,
+   reviewed:false,
+   calculation:null,
+   snapshot:null
+  };
+
+  renderReview(CASE);
+
+  $("reviewCard").classList.remove("hidden");
+  $("calcCard").classList.add("hidden");
 
  }catch(err){
-   console.error(err);
-   log(`ERROR: ${err.message||err}`);
-   alert("No fue posible procesar el PDF. Revisa el diagnóstico y vuelve a intentarlo.");
+  console.error(err);
+
+  log(`ERROR: ${err.message||err}`);
+
+  $("diag").textContent=
+   `Error al procesar PDF: ${err.message||err}`;
+
+  alert(
+   "No fue posible procesar el PDF.\n\n"+
+   (err.message||err)
+  );
+
  }finally{
-   $("processBtn").disabled=false;
-   checkLibs();
+  $("processBtn").disabled=false;
+  checkLibs();
  }
 }
 
 function renderReview(c){
  const h=c.header||{};
+
  const weeks=h.weeks==null?"—":h.weeks;
  const discounted=h.discountedWeeks??0;
  const reinstated=h.reinstatedWeeks??0;
- const c2=(Number(weeks)||0)+(Number(reinstated)||0);
-
- $("reviewSummary").innerHTML=`
- <div class="grid">
-  <div><b>Nombre</b><br>${h.name||"—"}</div>
-  <div><b>NSS</b><br>${h.nss||"—"}</div>
-  <div><b>CURP</b><br>${h.curp||"—"}</div>
-  <div><b>Fecha de nacimiento</b><br>${h.dob||"—"}</div>
-  <div><b>Fecha de emisión</b><br>${h.issueDate||"—"}</div>
-  <div><b>Semanas IMSS</b><br>${weeks}</div>
-  <div><b>Semanas descontadas</b><br>${discounted}</div>
-  <div><b>Semanas reintegradas</b><br>${reinstated}</div>
-  <div><b>C2 preliminar</b><br>${c2}</div>
- </div>
- <div class="card info">
-  <b>Importante:</b> la revisión es obligatoria. Los datos no se incorporan al expediente de cálculo hasta que sean aceptados.
- </div>`;
-
- let rows=c.history||[];
-
- $("historyReview").innerHTML=`
- <h3>Historia laboral detectada</h3>
- <div class="small muted">Registros identificados por OCR. Verifica fechas y SBC antes de aceptar.</div>
- <div class="tablewrap">
- <table class="tbl">
-  <thead>
-   <tr>
-    <th>#</th>
-    <th>Alta</th>
-    <th>Baja</th>
-    <th>SBC OCR</th>
-    <th>SBC para cálculo</th>
-    <th>Estado</th>
-   </tr>
-  </thead>
-  <tbody>
-   ${rows.map((r,i)=>`
-    <tr>
-     <td>${i+1}</td>
-     <td><input data-hist="${i}" data-field="alta" value="${r.alta||""}"></td>
-     <td><input data-hist="${i}" data-field="baja" value="${r.baja||""}"></td>
-     <td>${r.sbc==null?"—":num(r.sbc)}</td>
-     <td><input type="number" step="0.01" data-hist="${i}" data-field="sbc" value="${r.sbc==null?"":r.sbc}"></td>
-     <td>${r.status||"OCR"}</td>
-    </tr>`).join("")}
-  </tbody>
- </table>
- </div>`;
-
- document.querySelectorAll("[data-hist]").forEach(el=>{
-   el.addEventListener("change",e=>{
-     const i=Number(e.target.dataset.hist);
-     const field=e.target.dataset.field;
-     if(CASE&&CASE.history&&CASE.history[i]){
-       CASE.history[i][field]=field==="sbc"?parseMoney(e.target.value):e.target.value;
-       CASE.history[i].status="MANUAL/REVISADO";
-     }
-   });
- });
-}
-
-$("acceptBtn").addEventListener("click",()=>{
- if(!CASE){
-   alert("No existe información para aceptar.");
-   return;
- }
-
- CASE.reviewed=true;
- CASE.reviewAcceptedAt=new Date().toISOString();
-
- $("reviewCard").classList.add("hidden");
- $("calcCard").classList.remove("hidden");
-
- refreshMinimumFields();
-
- log("Datos revisados y aceptados.");
- log("El expediente queda habilitado para cálculo.");
-});
-
-$("rejectBtn").addEventListener("click",()=>{
- CASE=null;
- OCR_PAGES=[];
- $("reviewCard").classList.add("hidden");
- $("calcCard").classList.add("hidden");
- $("log").textContent="Datos rechazados. Puedes seleccionar nuevamente el PDF.";
-});
-
-function ageDetail(dob,cutoff){
- const b=new Date(dob+"T00:00:00");
- const c=new Date(cutoff+"T00:00:00");
-
- if(Number.isNaN(b.getTime())||Number.isNaN(c.getTime())){
-   return {years:0,months:0,days:0,creditedYear:0};
- }
-
- let years=c.getFullYear()-b.getFullYear();
- let months=c.getMonth()-b.getMonth();
- let days=c.getDate()-b.getDate();
-
- if(days<0){
-   months--;
-   const prev=new Date(c.getFullYear(),c.getMonth(),0);
-   days+=prev.getDate();
- }
-
- if(months<0){
-   years--;
-   months+=12;
- }
 
  /*
-  Regla Ley 73 utilizada por esta aplicación:
-  al llegar a 64 años 6 meses + 1 día se reconoce
-  el porcentaje correspondiente al año siguiente.
+  C2 preliminar:
+  semanas actuales + semanas reintegradas.
+  Este valor NO se utiliza en Escenario 1.
  */
- let creditedYear=years;
+ const c2=
+  (Number(weeks)||0)+
+  function render73Result(x){
 
- if(years>=60 && years<65){
-   const halfYearDate=new Date(
-     b.getFullYear()+years,
-     b.getMonth()+6,
-     b.getDate()+1
-   );
+ const min=
+  Number($("minPension").value)||0;
 
-   if(c>=halfYearDate){
-     creditedYear=Math.min(65,years+1);
-   }
- }
-
- if(years>=65){
-   creditedYear=65;
- }
-
- return {years,months,days,creditedYear};
-}
-
-function l73Factor(creditedYear){
- const table={
-  60:{percent:75},
-  61:{percent:80},
-  62:{percent:85},
-  63:{percent:90},
-  64:{percent:95},
-  65:{percent:100}
- };
-
- const p=table[creditedYear]||0;
-
- return {
-   percent:p.percent,
-   isVejez:creditedYear>=65
- };
-}
-
-function reconstructIntervals(history,cutoff){
- const events=[];
-
- for(const r of history||[]){
-   if(!r.alta)continue;
-
-   let start=r.alta;
-   let end=r.baja||cutoff;
-
-   if(start>cutoff)continue;
-   if(end>cutoff)end=cutoff;
-   if(end<start)continue;
-
-   events.push({
-     start,
-     end,
-     sbc:Number(r.sbc)||0
-   });
- }
-
- events.sort((a,b)=>a.start.localeCompare(b.start));
-
- const boundaries=new Set();
-
- for(const e of events){
-   boundaries.add(e.start);
-   const next=new Date(e.end+"T00:00:00");
-   next.setDate(next.getDate()+1);
-   boundaries.add(next.toISOString().slice(0,10));
- }
-
- const dates=[...boundaries].sort();
-
- const segments=[];
-
- for(let i=0;i<dates.length-1;i++){
-   const s=dates[i];
-   const next=dates[i+1];
-
-   if(s>=cutoff)continue;
-
-   const d1=new Date(s+"T00:00:00");
-   const d2=new Date(next+"T00:00:00");
-
-   let days=Math.round((d2-d1)/86400000);
-
-   if(days<=0)continue;
-
-   if(next>cutoff){
-     days=daysBetween(s,cutoff);
-   }
-
-   const active=events.filter(e=>e.start<=s&&e.end>=s);
-
-   if(active.length){
-     segments.push({
-       start:s,
-       end:next>cutoff?cutoff:new Date(d2.getTime()-86400000).toISOString().slice(0,10),
-       days,
-       employers:active.length,
-       sbc:active.reduce((sum,e)=>sum+(Number(e.sbc)||0),0)
-     });
-   }
- }
-
- return segments;
-}
-
-function totalReconstructedDays(segments){
- return segments.reduce((s,x)=>s+x.days,0);
-}
-
-function averageLast250Weeks(history,cutoff){
- const segments=reconstructIntervals(history,cutoff);
-
- if(!segments.length){
-   return {
-     days:0,
-     weeks:0,
-     average:0,
-     used:[]
-   };
- }
-
- let remaining=1750;
- let totalSalaryDays=0;
- const used=[];
-
- for(let i=segments.length-1;i>=0&&remaining>0;i--){
-   const seg=segments[i];
-   const take=Math.min(remaining,seg.days);
-
-   totalSalaryDays+=take*seg.sbc;
-   remaining-=take;
-
-   used.push({
-     ...seg,
-     usedDays:take,
-     amount:take*seg.sbc
-   });
- }
-
- const daysUsed=1750-remaining;
-
- return {
-   days:daysUsed,
-   weeks:daysUsed/7,
-   average:daysUsed?totalSalaryDays/daysUsed:0,
-   used:used.reverse()
- };
-}
-
-function salaryGroup(avg,minWage){
- if(!avg||!minWage)return null;
- const times=avg/minWage;
-
- if(times<1)return {times,group:"Menos de 1.00"};
- if(times<=1.25)return {times,group:"1.00 a 1.25"};
- if(times<=1.50)return {times,group:"1.26 a 1.50"};
- if(times<=1.75)return {times,group:"1.51 a 1.75"};
- if(times<=2.00)return {times,group:"1.76 a 2.00"};
- if(times<=2.25)return {times,group:"2.01 a 2.25"};
- if(times<=2.50)return {times,group:"2.26 a 2.50"};
- if(times<=2.75)return {times,group:"2.51 a 2.75"};
- if(times<=3.00)return {times,group:"2.76 a 3.00"};
- if(times<=3.25)return {times,group:"3.01 a 3.25"};
- if(times<=3.50)return {times,group:"3.26 a 3.50"};
- if(times<=3.75)return {times,group:"3.51 a 3.75"};
- if(times<=4.00)return {times,group:"3.76 a 4.00"};
- if(times<=4.25)return {times,group:"4.01 a 4.25"};
- if(times<=4.50)return {times,group:"4.26 a 4.50"};
- if(times<=4.75)return {times,group:"4.51 a 4.75"};
- if(times<=5.00)return {times,group:"4.76 a 5.00"};
- if(times<=5.25)return {times,group:"5.01 a 5.25"};
- if(times<=5.50)return {times,group:"5.26 a 5.50"};
- if(times<=5.75)return {times,group:"5.51 a 5.75"};
- if(times<=6.00)return {times,group:"5.76 a 6.00"};
-
- return {times,group:"6.01 y mayor"};
-}
-
-function l73BasicFactor(times){
- /*
-  Valores de cuantía básica e incremento anual utilizados
-  por la versión de cálculo.
- */
- if(times>=6.01){
-   return {basic:0.13,increment:0.0245};
- }
-
- const table=[
-  [1.00,.80,.00563],
-  [1.25,.7711,.00563],
-  [1.50,.5818,.00814],
-  [1.75,.4923,.01178],
-  [2.00,.4267,.0143],
-  [2.25,.3766,.01631],
-  [2.50,.3368,.01798],
-  [2.75,.3048,.01939],
-  [3.00,.2792,.02062],
-  [3.25,.2577,.0217],
-  [3.50,.2395,.02283],
-  [3.75,.224,.02388],
-  [4.00,.211,.02488],
-  [4.25,.199,.0258],
-  [4.50,.189,.02676],
-  [4.75,.18,.02763],
-  [5.00,.1716,.0286],
-  [5.25,.164,.02954],
-  [5.50,.157,.03049],
-  [5.75,.1505,.03146],
-  [6.00,.1448,.03241]
- ];
-
- let selected=table[0];
-
- for(const row of table){
-   if(times>=row[0])selected=row;
- }
-
- return {
-   basic:selected[1],
-   increment:selected[2]
- };
-}
-
-function pensionBase(avg,weeklyWeeks,cutoff,dob){
- const minWage=Number($("minWage").value)||0;
- const group=salaryGroup(avg,minWage);
- const factors=l73BasicFactor(group?group.times:0);
-
- const credited=Math.floor(Math.max(0,(weeklyWeeks-500))/52);
- const remainderWeeks=Math.max(0,(weeklyWeeks-500)%52);
-
- const age=ageDetail(dob,cutoff);
- const ageFactor=l73Factor(age.creditedYear);
-
- const basicAmount=avg*365/12*factors.basic;
- const incrementAmount=avg*365/12*factors.increment*credited;
-
- const annualBase=basicAmount+incrementAmount;
- const monthly=annualBase;
-
- return {
-   avg,
-   minWage,
-   times:group?group.times:0,
-   group:group?group.group:"—",
-   basic:factors.basic,
-   increment:factors.increment,
-   fullIncrements:credited,
-   remainderWeeks,
-   age,
-   ageFactor,
-   monthlyBase:monthly,
-   monthlyCEA:monthly*(ageFactor.percent/100)
- };
-}
-
-function render73Result(x){
- const min=Number($("minPension").value)||0;
- const considered=Math.max(x.monthlyCEA,min);
+ const considered=
+  Math.max(
+   x.monthlyCEA,
+   min
+  );
 
  $("result73").innerHTML=`
+
  <div class="card success">
+
   <h3>Resultado</h3>
-  <div class="result">${money(considered)} mensuales</div>
-  <div class="small muted">Importe considerado después de comparar la pensión calculada con el parámetro mínimo.</div>
+
+  <div class="result">
+   ${money(considered)} mensuales
+  </div>
+
+  <div class="small muted">
+   Importe considerado después de comparar
+   la pensión calculada con el parámetro mínimo.
+  </div>
+
  </div>
 
  <div class="grid">
-  <div><b>Fecha de baja/corte</b><br>${x.cutoff}</div>
-  <div><b>Fecha de solicitud</b><br>NO UTILIZADA</div>
-  <div><b>Edad exacta al derecho</b><br>${x.age.years} años, ${x.age.months} meses, ${x.age.days} días</div>
-  <div><b>Año reconocido para porcentaje</b><br>${x.age.creditedYear}</div>
-  <div><b>Semanas utilizadas</b><br>${num(x.weeks)}</div>
-  <div><b>Días cotizados reconstruidos</b><br>${num(x.avgDays)} / 1750</div>
-  <div><b>Salario diario promedio</b><br>${money(x.average)}</div>
-  <div><b>Veces salario mínimo</b><br>${x.times.toFixed(4)}</div>
-  <div><b>Grupo Ley 73</b><br>${x.group}</div>
-  <div><b>Cuantía básica</b><br>${(x.basic*100).toFixed(2)}%</div>
-  <div><b>Incremento anual</b><br>${(x.increment*100).toFixed(3)}%</div>
-  <div><b>Incrementos completos</b><br>${x.fullIncrements} + fracción ${x.remainderWeeks}</div>
-  <div><b>Pensión mensual base</b><br>${money(x.monthlyBase)}</div>
-  <div><b>Porcentaje CEA/Vejez</b><br>${x.ageFactor.percent}%</div>
-  <div><b>Pensión mensual CEA/Vejez</b><br>${money(x.monthlyCEA)}</div>
-  <div><b>Pensión mínima parámetro</b><br>${min?money(min):"No capturado"}</div>
-  <div><b>Importe considerado</b><br>${money(considered)}</div>
- </div>`;
+
+  <div class="field">
+   <b>Fecha de baja/corte</b>
+   ${x.cutoff}
+  </div>
+
+  <div class="field">
+   <b>Fecha de solicitud</b>
+   NO UTILIZADA
+  </div>
+
+  <div class="field">
+   <b>Edad exacta al derecho</b>
+   ${x.age.years} años,
+   ${x.age.months} meses,
+   ${x.age.days} días
+  </div>
+
+  <div class="field">
+   <b>Año reconocido para porcentaje</b>
+   ${x.age.creditedYear}
+  </div>
+
+  <div class="field">
+   <b>Semanas utilizadas</b>
+   ${num(x.weeks)}
+  </div>
+
+  <div class="field">
+   <b>Días cotizados reconstruidos</b>
+   ${num(x.avgDays)} / 1750
+  </div>
+
+  <div class="field">
+   <b>Salario diario promedio</b>
+   ${money(x.average)}
+  </div>
+
+  <div class="field">
+   <b>Veces salario mínimo</b>
+   ${x.times.toFixed(4)}
+  </div>
+
+  <div class="field">
+   <b>Grupo Ley 73</b>
+   ${x.group}
+  </div>
+
+  <div class="field">
+   <b>Cuantía básica</b>
+   ${(x.basic*100).toFixed(2)}%
+  </div>
+
+  <div class="field">
+   <b>Incremento anual</b>
+   ${(x.increment*100).toFixed(3)}%
+  </div>
+
+  <div class="field">
+   <b>Incrementos completos</b>
+   ${x.fullIncrements}
+   + fracción ${x.remainderWeeks}
+  </div>
+
+  <div class="field">
+   <b>Pensión mensual base</b>
+   ${money(x.monthlyBase)}
+  </div>
+
+  <div class="field">
+   <b>Porcentaje CEA/Vejez</b>
+   ${x.ageFactor.percent}%
+  </div>
+
+  <div class="field">
+   <b>Pensión mensual CEA/Vejez</b>
+   ${money(x.monthlyCEA)}
+  </div>
+
+  <div class="field">
+   <b>Pensión mínima parámetro</b>
+   ${min?money(min):"No capturado"}
+  </div>
+
+  <div class="field">
+   <b>Importe considerado</b>
+   ${money(considered)}
+  </div>
+
+ </div>
+
+ `;
 
  $("trace73").innerHTML=`
+
  <div class="card">
+
   <h3>Cómo llegó al resultado</h3>
-  <div class="trace">${x.trace}</div>
- </div>`;
+
+  <pre>${x.trace}</pre>
+
+ </div>
+
+ `;
+
 }
 
 $("calcBtn").addEventListener("click",()=>{
+
  if(!CASE||!CASE.reviewed){
-   alert("Primero debes procesar y aceptar la revisión de la constancia.");
-   return;
+
+  alert(
+   "Primero debes procesar y aceptar "+
+   "la revisión de la constancia."
+  );
+
+  return;
+
  }
 
- const cutoff=$("cutoffDate").value||isoToday();
- const dob=CASE.header?.dob;
+ const cutoff=
+  $("cutoffDate").value||
+  isoToday();
+
+ const dob=
+  CASE.header?.dob;
 
  if(!dob){
-   alert("No se pudo determinar la fecha de nacimiento. Corrígela en la revisión antes de calcular.");
-   return;
+
+  alert(
+   "No se pudo determinar la fecha de nacimiento. "+
+   "Corrígela antes de calcular."
+  );
+
+  return;
+
  }
-
- const weeks=Number(CASE.header?.weeks)||0;
-
- if(weeks<=0){
-   alert("No se detectaron semanas válidas.");
-   return;
- }
-
- const avg=averageLast250Weeks(CASE.history||[],cutoff);
 
  /*
-  Escenario 1:
-  utiliza exactamente las semanas de la constancia.
-  NO suma nuevamente las semanas reintegradas.
+  ESCENARIO 1
+
+  Se utilizan exactamente las semanas
+  que aparecen en la constancia.
+
+  Para Rodrigo:
+  705 semanas.
+
+  Las 20 semanas reintegradas NO se
+  agregan nuevamente.
  */
- const p=pensionBase(avg.average,weeks,cutoff,dob);
 
- const min= getMinimumSnapshot(cutoff);
- const minMonthly=min?min.monthly:0;
+ const weeks=
+  Number(
+   CASE.header?.weeks
+  )||0;
 
- $("minPension").value=minMonthly?minMonthly.toFixed(2):"";
+ if(weeks<=0){
+
+  alert(
+   "No se detectaron semanas válidas."
+  );
+
+  return;
+
+ }
+
+ /*
+  Promedio de los últimos 1,750 días
+  realmente cotizados.
+ */
+ const avg=
+  averageLast250Weeks(
+   CASE.history||[],
+   cutoff
+  );
+
+ const p=
+  pensionBase(
+   avg.average,
+   weeks,
+   cutoff,
+   dob
+  );
+
+ const min=
+  getMinimumSnapshot(
+   cutoff
+  );
+
+ const minMonthly=
+  min?
+   min.monthly:
+   0;
+
+ $("minPension").value=
+  minMonthly?
+   minMonthly.toFixed(2):
+   "";
 
  const trace=[
+
   `VERSIÓN: ${APP_VERSION}`,
+
   ``,
+
   `REFERENCIA TEMPORAL`,
+
   `Fecha de baja/corte: ${cutoff}`,
+
   `Fecha de solicitud: NO UTILIZADA`,
+
   ``,
+
   `SEMANAS`,
+
   `Semanas tomadas de la constancia: ${weeks}`,
+
   `Escenario 1: no se agregan nuevamente las semanas reintegradas.`,
+
   ``,
+
   `PROMEDIO DE SALARIO`,
+
   `Días utilizados: ${avg.days}`,
+
   `Días objetivo: 1750`,
+
   `Semanas equivalentes: ${(avg.days/7).toFixed(4)}`,
-  `Salario diario promedio: ${money(avg.average)}`,
-  ``,
-  `SALARIO MÍNIMO`,
-  `Salario mínimo diario: ${money(p.minWage)}`,
-  `Veces salario mínimo: ${p.times.toFixed(4)}`,
-  `Grupo: ${p.group}`,
-  ``,
-  `LEY 73`,
-  `Cuantía básica: ${(p.basic*100).toFixed(2)}%`,
-  `Incremento anual: ${(p.increment*100).toFixed(3)}%`,
-  `Incrementos completos: ${p.fullIncrements}`,
-  `Fracción restante: ${p.remainderWeeks} semanas`,
-  ``,
-  `EDAD`,
-  `Edad cronológica: ${p.age.years} años, ${p.age.months} meses, ${p.age.days} días`,
-  `Año reconocido: ${p.age.creditedYear}`,
-  `Porcentaje CEA/Vejez: ${p.ageFactor.percent}%`,
-  ``,
-  `PENSIÓN`,
-  `Pensión mensual base: ${money(p.monthlyBase)}`,
-  `Pensión mensual CEA/Vejez: ${money(p.monthlyCEA)}`,
-  ``,
-  `PENSIÓN MÍNIMA`,
-  min?`Fórmula: ${money(min.wage)} × ${min.days} / ${min.months} × ${min.factor}`,
-  min?`Base mensual: ${money(min.base)}`:"",
-  min?`Mínimo considerado: ${money(min.monthly)}`:"",
-  ``,
-  `IMPORTE FINAL CONSIDERADO: ${money(Math.max(p.monthlyCEA,minMonthly))}`
- ].filter(Boolean).join("\\n");
-
- const result={
-   ...p,
-   cutoff,
-   weeks,
-   average:p.avg,
-   avgDays:avg.days,
-   minPension:minMonthly,
-   trace
- };
-
- CASE.calculation=result;
- render73Result(result);
-
- $("snapshotBtn").disabled=false;
-});
-$("snapshotBtn").addEventListener("click",()=>{
- if(!CASE||!CASE.calculation){
-   alert("Primero realiza el cálculo.");
-   return;
- }
-
- const cutoff=CASE.calculation.cutoff;
-
- const minimum=getMinimumSnapshot(cutoff);
-
- PARAM_SNAPSHOT={
-   snapshotAt:new Date().toISOString(),
-   calculationDate:cutoff,
-   appVersion:APP_VERSION,
-   parameters:PARAM_CATALOG
-     .filter(p=>p.from<=cutoff&&(!p.to||cutoff<=p.to))
-     .map(p=>({
-       key:p.key,
-       label:p.label,
-       value:p.value,
-       unit:p.unit,
-       source:p.source,
-       version:p.version,
-       from:p.from,
-       to:p.to
-     })),
-   minimumPension:minimum
- };
-
- CASE.snapshot=PARAM_SNAPSHOT;
-
- const blob=new Blob(
-   [JSON.stringify({
-     caseData:{
-       name:CASE.header?.name||"",
-       nss:CASE.header?.nss||"",
-       curp:CASE.header?.curp||"",
-       dob:CASE.header?.dob||"",
-       issueDate:CASE.header?.issueDate||"",
-       weeks:CASE.header?.weeks||0,
-       discountedWeeks:CASE.header?.discountedWeeks||0,
-       reinstatedWeeks:CASE.header?.reinstatedWeeks||0
-     },
-     calculation:CASE.calculation,
-     snapshot:PARAM_SNAPSHOT
-   },null,2)],
-   {type:"application/json"}
- );
-
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");
- a.href=url;
- a.download=`IMSS_Pensiones_Snapshot_${cutoff}.json`;
- document.body.appendChild(a);
- a.click();
- a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-
- log("Snapshot de parámetros y cálculo generado.");
-});
-
-function showCalculator(){
- $("calcCard").classList.remove("hidden");
- refreshMinimumFields();
-}
-
-window.addEventListener("error",e=>{
- console.error(e.error||e.message);
- const d=$("diag");
- if(d){
-   d.textContent=`Error JavaScript: ${e.message||"error desconocido"}`;
-   d.className="small bad";
- }
-});
-
-window.addEventListener("unhandledrejection",e=>{
- console.error(e.reason);
- const d=$("diag");
- if(d){
-   d.textContent=`Error: ${e.reason?.message||e.reason||"error desconocido"}`;
-   d.className="small bad";
- }
-});
-
-$("processBtn").addEventListener("click",processPDF);
-
-if("serviceWorker" in navigator){
- window.addEventListener("load",()=>{
-   navigator.serviceWorker.register("./sw.js")
-     .then(()=>{
-       log("Service Worker registrado.");
-     })
-     .catch(err=>{
-       log(`Service Worker no registrado: ${err.message||err}`);
-     });
- });
-}
-
-renderParams();
-refreshMinimumFields();
-checkLibs();
-
-</script></body></html>
