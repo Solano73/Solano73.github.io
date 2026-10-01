@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123b5d">
+<title>IMSS Pensiones — Página 1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#17202a;background:#f3f6f8}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px #00000012}h1,h2{margin:0 0 8px}.muted{color:#64717d;font-size:14px}.upload{border:2px dashed #aebdca;border-radius:14px;padding:18px;text-align:center}.upload input{width:100%;margin:10px 0}button{border:0;border-radius:10px;padding:11px 16px;font-weight:700;background:#123b5d;color:white;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.status{margin-top:10px;padding:10px;border-radius:10px;background:#eef4f8;font-size:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.field{border:1px solid #dce3e8;border-radius:12px;padding:12px;background:#fafcfd}.label{font-size:12px;color:#657582;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}.value{font-size:18px;font-weight:750;word-break:break-word}.big{font-size:24px}.ok{background:#eaf7ee;color:#176334}.warn{background:#fff6df;color:#7a5600}.error{background:#fff0f0;color:#8d2020}.hidden{display:none}.small{font-size:12px}.footer{font-size:12px;color:#7a8791;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>IMSS Pensiones — Página 1</h1>
+    <div class="muted">Lectura directa del texto del PDF. Esta versión no utiliza OCR.</div>
+  </div>
+
+  <div class="card upload">
+    <h2>1. Cargar constancia</h2>
+    <input id="pdfInput" type="file" accept="application/pdf,.pdf">
+    <div id="status" class="status">Selecciona una constancia PDF.</div>
+  </div>
+
+  <div id="page1" class="card hidden">
+    <h2>2. Datos de la constancia</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><div class="label">Nombre</div><div id="name" class="value">—</div></div>
+      <div class="field"><div class="label">NSS</div><div id="nss" class="value">—</div></div>
+      <div class="field"><div class="label">CURP</div><div id="curp" class="value">—</div></div>
+      <div class="field"><div class="label">Total de semanas cotizadas</div><div id="weeks" class="value big">—</div></div>
+      <div class="field"><div class="label">Edad</div><div id="age" class="value">—</div></div>
+      <div class="field"><div class="label">Salario promedio — últimas 250 semanas</div><div id="average" class="value big">—</div></div>
+    </div>
+    <div id="details" class="status hidden"></div>
+    <div class="footer">El salario promedio se calcula únicamente cuando el texto del PDF permite reconstruir los últimos 1,750 días con fechas y salarios. No se completan datos faltantes con ceros.</div>
+  </div>
+
+  <div id="debug" class="card hidden">
+    <h2>Texto leído</h2>
+    <div class="small muted">Solo para verificar que la constancia fue leída como texto y no como imagen.</div>
+    <pre id="textPreview" style="white-space:pre-wrap;max-height:260px;overflow:auto;background:#f5f7f9;padding:12px;border-radius:10px"></pre>
+  </div>
+</div>
+
+<script type="module">
+const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+
+const $=id=>document.getElementById(id);
+const clean=s=>String(s??'').replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').trim();
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function normalizeText(t){
+  return String(t||'')
+    .replace(/[\u2010-\u2015]/g,'-')
+    .replace(/\u00a0/g,' ')
+    .replace(/[ \t]+/g,' ')
+    .replace(/\r/g,'');
+}
+
+function parseDMY(s){
+  const m=String(s||'').match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})\b/);
+  if(!m)return null;
+  const d=new Date(+m[3],+m[2]-1,+m[1]);
+  if(d.getFullYear()!==+m[3]||d.getMonth()!==+m[2]-1||d.getDate()!==+m[1])return null;
+  return d;
+}
+function dmy(d){return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`:''}
+function daysInclusive(a,b){return Math.max(0,Math.floor((b-a)/86400000)+1)}
+
+function curpDob(curp){
+  const c=String(curp||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(!/^[A-Z]{4}\d{6}[A-Z]{6}[A-Z0-9]{2}$/.test(c))return null;
+  const yy=+c.slice(4,6),mm=+c.slice(6,8),dd=+c.slice(8,10);
+  const marker=c[16];
+  const year=/^[A-Z]$/.test(marker)?2000+yy:1900+yy;
+  const d=new Date(year,mm-1,dd);
+  return d.getFullYear()===year&&d.getMonth()===mm-1&&d.getDate()===dd?d:null;
+}
+
+function exactAge(dob,at){
+  if(!dob||!at)return null;
+  let y=at.getFullYear()-dob.getFullYear();
+  let m=at.getMonth()-dob.getMonth();
+  let d=at.getDate()-dob.getDate();
+  if(d<0){m--;const prev=new Date(at.getFullYear(),at.getMonth(),0);d+=prev.getDate();}
+  if(m<0){y--;m+=12;}
+  return {years:y,months:m,days:d};
+}
+function ageText(a){return a?`${a.years} años, ${a.months} meses y ${a.days} días`:'No disponible'}
+
+// Extrae texto respetando saltos de línea aproximados usando transform[5] (posición Y)
+async function extractPdfText(file){
+  const data=new Uint8Array(await file.arrayBuffer());
+  const pdf=await pdfjsLib.getDocument({data}).promise;
+  const pages=[];
+  for(let pno=1;pno<=pdf.numPages;pno++){
+    const page=await pdf.getPage(pno);
+    const tc=await page.getTextContent({normalizeWhitespace:true});
+    const items=tc.items.filter(x=>typeof x.str==='string'&&x.str.trim());
+    items.sort((a,b)=>{
+      const ay=-(a.transform?.[5]??0),by=-(b.transform?.[5]??0);
+      if(Math.abs(ay-by)>2)return ay-by;
+      return (a.transform?.[4]??0)-(b.transform?.[4]??0);
+    });
+    const lines=[];
+    for(const it of items){
+      const y=it.transform?.[5]??0;
+      let line=lines.findLast(x=>Math.abs(x.y-y)<=2.5);
+      if(!line){line={y,text:''};lines.push(line)}
+      line.text += (line.text?' ':'')+it.str.trim();
+    }
+    lines.sort((a,b)=>b.y-a.y);
+    pages.push(lines.map(x=>clean(x.text)).filter(Boolean).join('\n'));
+  }
+  return {text:normalizeText(pages.join('\n\n===== PÁGINA %PAGE% =====\n\n')),pages:pdf.numPages};
+}
+
+function firstMatch(text,regex){const m=text.match(regex);return m?clean(m[1]):''}
+
+function parseHeader(text){
+  const t=normalizeText(text);
+  const o={name:'',nss:'',curp:'',weeks:null,dob:null};
+
+  // Nombre: prioriza la línea posterior a Estimado(a), antes de NSS/CURP.
+  const lines=t.split('\n').map(clean).filter(Boolean);
+  for(let i=0;i<lines.length;i++){
+    if(/Estimado\s*\(?a\)?/i.test(lines[i])){
+      for(let j=i+1;j<Math.min(i+5,lines.length);j++){
+        const s=lines[j];
+        if(/^(NSS|CURP|Fecha|Total de semanas)/i.test(s))continue;
+        const candidate=s.replace(/^Nombre\s*[:\-]?\s*/i,'').trim();
+        if(/^[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ .'-]{4,}$/i.test(candidate)&&!(/derechohabiente|instituto|seguridad social/i.test(candidate))){o.name=candidate;break}
+      }
+    }
+  }
+  if(!o.name){
+    const m=t.match(/(?:Nombre(?:\s+del\s+asegurado)?|Asegurado)\s*[:\-]?\s*([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ .'-]{4,})/i);
+    if(m)o.name=clean(m[1]);
+  }
+
+  let m=t.match(/\bNSS\s*[:\-]?\s*(\d{10,12})\b/i);if(m)o.nss=m[1];
+  if(!o.nss){m=t.match(/\b(?:Número\s+de\s+Seguridad\s+Social|No\.\s*de\s*Seguridad\s*Social)\s*[:\-]?\s*(\d{10,12})\b/i);if(m)o.nss=m[1]}
+
+  m=t.match(/\bCURP\s*[:\-]?\s*([A-Z0-9]{18})\b/i);if(m)o.curp=m[1].toUpperCase();
+  if(!o.curp){m=t.match(/\b([A-Z]{4}\d{6}[A-Z]{6}[A-Z0-9]{2})\b/);if(m)o.curp=m[1].toUpperCase()}
+
+  m=t.match(/Total\s+de\s+semanas\s+cotizadas\s*[:\-]?\s*([\d,\.]+)/i);
+  if(m)o.weeks=Number(m[1].replace(/,/g,''));
+  if(!Number.isFinite(o.weeks)){
+    m=t.match(/Semanas\s+cotizadas\s+IMSS\s+([\d,\.]+)\s+[\d,\.]+\s+[\d,\.]+/i);
+    if(m)o.weeks=Number(m[1].replace(/,/g,''));
+  }
+  o.dob=curpDob(o.curp);
+  return o;
+}
+
+// Convierte renglones de movimientos a intervalos {start,end,sbc}.
+function parseSalaryIntervals(text){
+  const lines=text.split('\n').map(clean).filter(Boolean);
+  const events=[];
+  for(const line of lines){
+    let m=line.match(/^(?:ALTA|REINGRESO|BAJA|MODIFICACI[ÓO]N(?:\s+DE\s+SALARIO)?)\s+(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{4})\s+\$?\s*([\d,]+(?:\.\d{1,2})?)/i);
+    if(m){events.push({type:m[0].split(/\s+/)[0].toUpperCase(),date:parseDMY(m[1]),sbc:Number(m[2].replace(/,/g,''))});continue}
+    m=line.match(/(ALTA|REINGRESO|BAJA|MODIFICACI[ÓO]N(?:\s+DE\s+SALARIO)?).*?(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{4}).*?\$\s*([\d,]+(?:\.\d{1,2})?)/i);
+    if(m)events.push({type:m[1].toUpperCase(),date:parseDMY(m[2]),sbc:Number(m[3].replace(/,/g,''))});
+  }
+  return events.filter(x=>x.date&&Number.isFinite(x.sbc)).sort((a,b)=>a.date-b.date);
+}
+
+function findLatestCutoff(text,events){
+  let latest=null;
+  for(const e of events){if(/BAJA/i.test(e.type)&&e.date&&(!latest||e.date>latest))latest=e.date}
+  if(latest)return latest;
+  const lines=text.split('\n').map(clean);
+  const dates=[];
+  for(const line of lines){if(/fecha\s+de\s+baja/i.test(line)){const d=parseDMY(line);if(d)dates.push(d)}}
+  return dates.sort((a,b)=>b-a)[0]||null;
+}
+
+function weightedAverageLast1750(events,cutoff){
+  if(!cutoff||!events.length)return null;
+  const start=new Date(cutoff.getFullYear(),cutoff.getMonth(),cutoff.getDate()-1749);
+  const relevant=events.filter(e=>e.date<=cutoff);
+  if(!relevant.length)return null;
+  // Construye segmentos: cada movimiento cambia el SBC hasta el siguiente movimiento.
+  const segs=[];
+  for(let i=0;i<relevant.length;i++){
+    const e=relevant[i];
+    const next=relevant[i+1]?.date||new Date(cutoff.getTime()+86400000);
+    const a=e.date>start?e.date:start;
+    const b=new Date(Math.min(next.getTime()-86400000,cutoff.getTime()));
+    if(a<=b&&e.sbc>0)segs.push({a,b,sbc:e.sbc});
+  }
+  let covered=0,weighted=0;
+  for(const s of segs){const d=daysInclusive(s.a,s.b);covered+=d;weighted+=d*s.sbc}
+  if(covered<1750)return {avg:null,coveredDays:covered,start,cutoff};
+  return {avg:weighted/covered,coveredDays:covered,start,cutoff};
+}
+
+function reset(){
+  ['name','nss','curp','weeks','age','average'].forEach(id=>$(id).textContent='—');
+  $('details').classList.add('hidden');$('page1').classList.add('hidden');$('debug').classList.add('hidden');$('textPreview').textContent='';
+}
+
+$('pdfInput').addEventListener('change',async ev=>{
+  reset();
+  const file=ev.target.files?.[0];
+  if(!file)return;
+  $('status').className='status';$('status').textContent='Leyendo el texto interno del PDF…';
+  try{
+    const out=await extractPdfText(file);
+    const text=out.text.replace(/%PAGE%/g,(_,i)=>String(i+1));
+    if(text.replace(/[^\p{L}\p{N}]/gu,'').length<80)throw new Error('El PDF no contiene suficiente texto seleccionable.');
+    const h=parseHeader(text);
+    const events=parseSalaryIntervals(text);
+    const cutoff=findLatestCutoff(text,events);
+    const age=exactAge(h.dob,cutoff);
+    const avg=weightedAverageLast1750(events,cutoff);
+
+    $('name').textContent=h.name||'No identificado';
+    $('nss').textContent=h.nss||'No identificado';
+    $('curp').textContent=h.curp||'No identificado';
+    $('weeks').textContent=Number.isFinite(h.weeks)?h.weeks.toLocaleString('es-MX'):'No identificado';
+    $('age').textContent=ageText(age);
+    $('average').textContent=avg?.avg!=null?new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(avg.avg):'No disponible';
+
+    const notes=[];
+    notes.push(`<b>Lectura:</b> texto directo del PDF`);
+    notes.push(`<b>Páginas:</b> ${out.pages}`);
+    if(h.dob)notes.push(`<b>Fecha de nacimiento:</b> ${dmy(h.dob)}`);else notes.push('<b>Fecha de nacimiento:</b> no se pudo obtener del CURP');
+    if(cutoff)notes.push(`<b>Fecha usada para la edad y promedio:</b> ${dmy(cutoff)}`);else notes.push('<b>Fecha de corte:</b> no identificada');
+    if(avg?.avg==null)notes.push(`<b>Promedio:</b> se encontraron ${avg?.coveredDays||0} de 1,750 días reconstruibles; no se inventó el resto.`);
+    $('details').innerHTML=notes.join(' &nbsp; | &nbsp;');$('details').classList.remove('hidden');
+    $('textPreview').textContent=text.slice(0,12000);$('debug').classList.remove('hidden');$('page1').classList.remove('hidden');
+    $('status').className='status ok';$('status').textContent=`PDF leído correctamente: ${out.pages} página(s). Se utilizó texto interno, no OCR.`;
+  }catch(e){
+    console.error(e);$('status').className='status error';$('status').textContent='No se pudo leer el PDF como texto: '+(e?.message||e);
+  }
+});
+</script>
+</body>
+</html>
